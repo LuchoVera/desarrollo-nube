@@ -1,0 +1,15 @@
+.home-div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  padding: 2rem;
+  margin: auto;
+}
+
+.home-div p {
+  font-size: 2rem;
+  font-weight: bold;
+}
