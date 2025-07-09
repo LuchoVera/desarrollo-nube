@@ -2,73 +2,78 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
-  FacebookAuthProvider,
 } from "firebase/auth";
-import { auth } from "../../firebaseinit";
+import { auth, db, analytics } from "../../firebaseinit";
+import { logEvent } from "firebase/analytics";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./login.css";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
 const Login: React.FC = () => {
-  const [email, setemail] = useState("");
-  const [password, setpassword] = useState("");
-  const [error, seterror] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigator = useNavigate();
 
-  const handlelogin = async (r: React.FormEvent) => {
-    r.preventDefault();
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigator("/home");
+      logEvent(analytics, "login", { method: "email" });
+      navigator("/auth-redirect");
     } catch (err: any) {
-      seterror(err.message);
+      setError(err.message);
     }
   };
 
-  const handlegooglelogin = async () => {
+  const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
     try {
-      await signInWithPopup(auth, provider);
-      navigator("/home");
-    } catch (err: any) {
-      seterror(err.message);
-    }
-  };
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
 
-  const handlefacebooklogin = async () => {
-    const provider = new FacebookAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      navigator("/home");
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+        await setDoc(userDocRef, {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName || "User",
+          role: "user",
+        });
+      }
+      logEvent(analytics, "login", { method: "google" });
+      navigator("/auth-redirect");
     } catch (err: any) {
-      seterror(err.message);
+      setError(err.message);
     }
   };
 
   return (
     <div className="login-div">
-      <h2>INICIAR SESION</h2>
-      <form className="form-form" onSubmit={handlelogin}>
+      <h2>LOGIN</h2>
+      <form className="form-form" onSubmit={handleLogin}>
         <input
           type="email"
           placeholder="email@example.com"
           value={email}
-          onChange={(a) => setemail(a.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
           placeholder="******"
           value={password}
-          onChange={(p) => setpassword(p.target.value)}
+          onChange={(p) => setPassword(p.target.value)}
         />
         <button type="submit">Login</button>
         {error && <p>{error}</p>}
       </form>
+      <button onClick={handleGoogleLogin}>Login with Google</button>
       <p>
-        ¿No tienes una cuenta? <Link to="/register">Regístrate</Link>
+        Don't have an account? <Link to="/register">Register</Link>
       </p>
-      <button onClick={handlegooglelogin}>Google</button>
-      <button onClick={handlefacebooklogin}>Facebook</button>
     </div>
   );
 };

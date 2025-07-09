@@ -1,0 +1,64 @@
+.artist-music-container {
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
+  text-align: center;
+}
+
+.artist-header-image {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.artist-music-container h1 {
+  font-size: 2.5rem;
+}
+
+.artist-music-container p {
+  color: #aaa;
+  margin-top: -1rem;
+  margin-bottom: 3rem;
+}
+
+.song-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  text-align: left;
+}
+
+.song-card {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background-color: var(--surface-color);
+  padding: 1rem;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.song-card:hover {
+  background-color: #2a2a2a;
+}
+
+.song-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.song-details {
+  flex-grow: 1;
+}
+
+.song-title {
+  margin: 0 0 1rem 0;
+}
+
+.song-player {
+  width: 100%;
+}
